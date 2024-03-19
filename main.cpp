@@ -6,6 +6,6 @@ int main(int argc, char const *argv[])
 
     std::cout << "Bilal is the best" << std::endl;
 
-    getch();
+    getch(); 
     return 0;
 }
