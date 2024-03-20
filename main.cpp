@@ -15,65 +15,22 @@ void showMenu()
 )" << std::endl;
 }
 
-Color randColor()
-{
-    int rand = std::rand() % 4; // 4 car nous avons 4 choix enum enter 0 a 4-1 = 3
-
-    switch (rand)
-    {
-    case 0:
-        return red;
-        break;
-    case 1:
-        return blue;
-        break;
-    case 2:
-        return yellow;
-        break;
-    case 3:
-        return green;
-        break;
-    }
-    return red;
-}
-Form randForm()
-{
-    int rand = std::rand() % 4; // 4 car nous avons 4 choix enum enter 0 a 4-1 = 3
-
-    switch (rand)
-    {
-    case 0:
-        return square;
-        break;
-    case 1:
-        return triangle;
-        break;
-    case 2:
-        return circle;
-        break;
-    case 3:
-        return diamond;
-        break;
-    }
-    return square;
-}
-
-Shape *randShape()
-{
-    return new Shape(randForm(), randColor());
-}
 int main()
 {
+    Game game;
 
-     ListSimple list(randShape());
-
-    for(int i = 0 ; i < 30 ; i++){
-        list.add(randShape());
+    while (char c = getch())
+    {
+        switch (c)
+        {
+        case 103: // g
+            game.insert(INSERT_LEFT);
+            break;
+        case 100:          // d
+            game.insert(); // par default INSERT_RIGHT
+            break;
+        }
     }
 
-     list.display();
-
-    // showMenu();
-    getch();
     return 0;
 }

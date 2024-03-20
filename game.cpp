@@ -79,15 +79,16 @@ NodeSimple *NodeSimple::getNext()
 
 /* Class ListSimple */
 
-ListSimple::ListSimple(Shape *shape)
+ListSimple::ListSimple()
 {
-    shape->setCoord(0, PLATEAU_POS_Y); // position initiale
-
-    last = new NodeSimple(shape);
-
-    size = 1;
+    last = NULL;
+    size = 0;
 }
 
+ListSimple::~ListSimple()
+{
+    // TODO: libérer l'espace alloué
+}
 bool ListSimple::isEmpty()
 {
     return last == NULL;
@@ -96,10 +97,7 @@ bool ListSimple::isEmpty()
 void ListSimple::display()
 {
     if (this->isEmpty())
-    {
-        std::cout << "IS EMPTY " << this->isEmpty();
         return;
-    }
 
     NodeSimple *temp = last;
 
@@ -113,6 +111,15 @@ void ListSimple::display()
 
 void ListSimple::add(Shape *shape, InsertionDirection direction)
 {
+
+    if (last == NULL)
+    {
+        shape->setCoord(0, PLATEAU_POS_Y); // position initiale
+        last = new NodeSimple(shape);
+        size++;
+
+        return;
+    }
 
     // creation d'une nouveau node simple
     NodeSimple *node = new NodeSimple(shape, last->getNext()); // last->getNext() retourn le premier de la list
@@ -128,12 +135,19 @@ void ListSimple::add(Shape *shape, InsertionDirection direction)
     }
     else // insertion a gauche
     {
-        // mise a jour des coordonnes
-        node->getShape()->setCoord(0, PLATEAU_POS_Y);
-        last->getShape()->setCoord(1, PLATEAU_POS_Y);
-
         // chainage
         last->setNext(node);
+
+        // mise a jour des coordonnes
+        node->getShape()->setCoord(0, PLATEAU_POS_Y);
+
+        NodeSimple *temp = node->getNext();
+
+        while (temp != node)
+        {
+            temp->getShape()->setCoord(temp->getShape()->getCoord().X + 1, PLATEAU_POS_Y);
+            temp = temp->getNext();
+        }
     }
 
     size++; // augmenter la taille de la list
@@ -143,29 +157,38 @@ void ListSimple::remove(Shape *)
 {
 }
 
+size_t ListSimple::getSize()
+{
+    return size;
+}
 /* Class NodeDouble */
 
-NodeDouble::NodeDouble(Shape *shape)
+NodeDouble::NodeDouble(NodeSimple *nodee)
 {
-    this->shape = shape;
+    this->node = node;
     prev = next = this; // NodeDouble point sur lui meme
 }
-NodeDouble::NodeDouble(Shape *shape, NodeDouble *prev, NodeDouble *next)
+
+NodeSimple *NodeDouble::getNode()
 {
-    this->shape = shape;
-    this->prev = prev;
-    this->next = next;
+    return node;
 }
 
-Shape *NodeDouble::getShape()
+void NodeDouble::setPrev(NodeDouble *prev)
 {
-    return shape;
+    this->prev = prev;
 }
 
 NodeDouble *NodeDouble::getPrev()
 {
     return prev;
 }
+
+void NodeDouble::setNext(NodeDouble *next)
+{
+    this->next = next;
+}
+
 NodeDouble *NodeDouble::getNext()
 {
     return next;
@@ -173,12 +196,89 @@ NodeDouble *NodeDouble::getNext()
 
 /* Class ListDouble */
 
-ListDouble::ListDouble(Shape *shape)
+ListDouble::ListDouble()
+{
+    last = NULL;
+    size = 0;
+}
+void ListDouble::add(NodeSimple *node)
+{
+    NodeDouble *temp = new NodeDouble(node);
+
+    if (last != NULL)
+    {
+        // chainage temp
+        temp->setNext(last->getNext());
+        temp->setPrev(last);
+
+        last->setNext(temp);
+        last->getNext()->setPrev(temp);
+    }
+
+    last = temp;
+}
+void ListDouble::remove(NodeSimple *node)
 {
 }
-void ListDouble::add(Shape *shape)
+
+/* class Game */
+Game::Game()
 {
+
+    // réinitialiser le generateur de nombre aléatoire
+    std::srand(std::time(nullptr));
+
+    // initialiser le prochain
+    std::cout << "Prochain :";
+    this->updateNext();
+
+    // initialiser le plateau
+    plateau = new ListSimple();
+
+    std::cout << "\n\n\nPlateau : ";
+    plateau->display();
 }
-void ListDouble::remove(Shape *shape)
+Game::~Game()
 {
+    delete plateau;
+}
+Shape *Game::randShape()
+{
+    return new Shape(randForm(), randColor());
+}
+
+void Game::updateNext()
+{
+    next = randShape();
+    next->setCoord(11, 0);
+    next->display();
+}
+void Game::insert(InsertionDirection dir)
+{
+    if (plateau->getSize() == MAX_PLATEAU_SIZE)
+    {
+        this->displayGameOver();
+        return;
+    }
+    plateau->add(next, dir);
+    plateau->display();
+
+    this->updateNext();
+}
+
+void Game::displayGameOver()
+{
+
+    system("cls");
+
+    std::cout << R"(
+   _____                         ____                   _ 
+  / ____|                       / __ \                 | |
+ | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __  | |
+ | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__| | |
+ | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |    |_|
+  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|    (_)
+                                                          
+                                                          
+    )" << std::endl;
 }
