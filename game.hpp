@@ -22,6 +22,7 @@ public:
 
     void move(short x, short y = 0);
     Color getColor();
+    Form getForm();
 };
 
 class NodeSimple
@@ -32,7 +33,6 @@ class NodeSimple
 
 public:
     NodeSimple(Shape *);
-    NodeSimple(Shape *, NodeSimple *);
 
     Shape *getShape();
 
@@ -51,8 +51,8 @@ public:
 
     bool isEmpty();
     void display();
-    void add(Shape *, InsertionDirection);
-    void remove(Shape *);
+    void add(NodeSimple *, InsertionDirection);
+    void remove(NodeSimple *);
 
     size_t getSize();
 };
@@ -60,6 +60,7 @@ public:
 class NodeDouble
 {
     NodeSimple *node;
+
     NodeDouble *prev;
     NodeDouble *next;
 
@@ -83,23 +84,34 @@ class ListDouble
 
 public:
     ListDouble();
-    void add(NodeSimple *);
+    bool isEmpty();
+
+    void add(NodeSimple *, InsertionDirection = INSERT_RIGHT);
     void remove(NodeSimple *);
+
+    NodeDouble *getLast();
+
+    size_t getSize();
+
+    bool hasConsecutiveForms();
 };
 
 class Game
 {
-    Shape *next;
+    Shape *nextShape;
     ListSimple *plateau;
-    ListDouble *forms[4];  // Tableau de pointeurs vers les listes des pièces ayant la même forme sur le plateau
-    ListDouble *colors[4]; // Tableau de pointeurs vers les listes des pièces ayant la même couleur sur le plateau
+    ListDouble *listForms[4];  // Tableau de pointeurs vers les listes des pièces ayant la même forme sur le plateau
+    ListDouble *listColors[4]; // Tableau de pointeurs vers les listes des pièces ayant la même couleur sur le plateau
 
 public:
     Game(); // initialisation du jeu
     ~Game();
+
+    void start(); // lancer un nouveau jeu
+
     Shape *randShape();
 
-    void updateNext();
+    void updateNextShape();
 
     void insert(InsertionDirection = INSERT_RIGHT);
 

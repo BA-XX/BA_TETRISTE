@@ -47,3 +47,52 @@ Form randForm()
     }
     return square;
 }
+
+String convertFormToSymbole(Form form)
+{
+
+    switch (form)
+    {
+    case square:
+        return "S";
+        break;
+    case triangle:
+        return "T";
+        break;
+    case circle:
+        return "C";
+        break;
+    case diamond:
+        return "D";
+        break;
+    }
+
+    return "S";
+}
+
+int convertToColorCode(Color color)
+{
+
+    switch (color)
+    {
+    case red:
+        return FOREGROUND_RED;
+        break;
+    case blue:
+        return FOREGROUND_BLUE;
+        break;
+    case yellow:
+        return FOREGROUND_RED | FOREGROUND_GREEN;
+        break;
+    case green:
+        return FOREGROUND_GREEN;
+        break;
+    }
+
+    return FOREGROUND_RED;
+}
+
+int abs(int num)
+{
+    return (num < 0) ? -num : num;
+}

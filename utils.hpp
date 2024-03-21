@@ -5,22 +5,23 @@
 #include <windows.h>
 #include <ctime>
 
+
 typedef std::string String;
 
 enum Form
 {
-    square = 'S',
-    triangle = 'T',
-    circle = 'C',
-    diamond = 'D'
+    square,
+    triangle,
+    circle,
+    diamond
 };
 
 enum Color
 {
-    red = FOREGROUND_RED,
-    blue = FOREGROUND_BLUE,
-    yellow = FOREGROUND_RED | FOREGROUND_GREEN,
-    green = FOREGROUND_GREEN
+    red,
+    blue,
+    yellow,
+    green
 };
 
 enum InsertionDirection
@@ -29,6 +30,10 @@ enum InsertionDirection
     INSERT_LEFT
 };
 
-int randNumber(int min , int max);
+int randNumber(int min, int max);
 Color randColor();
 Form randForm();
+String convertFormToSymbole(Form form);
+int convertToColorCode(Color color);
+
+int abs(int num); // calcul la valeur absulue d'un nombre 
