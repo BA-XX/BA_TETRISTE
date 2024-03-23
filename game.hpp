@@ -4,6 +4,7 @@
 
 const short PLATEAU_POS_Y = 4; // definir l'emplacement du plateau
 const short MAX_PLATEAU_SIZE = 15;
+const HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 class Shape
 {
@@ -14,6 +15,7 @@ private:
 
 public:
     Shape(Form, Color, short x = 0, short y = 0);
+    ~Shape();
     void display();
     void remove();
 
@@ -33,6 +35,7 @@ class NodeSimple
 
 public:
     NodeSimple(Shape *);
+    ~NodeSimple();
 
     Shape *getShape();
 
@@ -53,6 +56,10 @@ public:
     void display();
     void add(NodeSimple *, InsertionDirection);
     void remove(NodeSimple *);
+
+    bool isLast(NodeSimple *);
+
+    NodeSimple *findPrev(NodeSimple *);
 
     size_t getSize();
 };
@@ -85,15 +92,17 @@ class ListDouble
 public:
     ListDouble();
     bool isEmpty();
+    bool isLast(NodeDouble *);
 
     void add(NodeSimple *, InsertionDirection = INSERT_RIGHT);
-    void remove(NodeSimple *);
+    void remove(NodeDouble *);
+
+    void removeByNode(NodeSimple *);
+    NodeDouble *findByNode(NodeSimple *);
 
     NodeDouble *getLast();
 
     size_t getSize();
-
-    bool hasConsecutiveForms();
 };
 
 class Game
@@ -102,6 +111,11 @@ class Game
     ListSimple *plateau;
     ListDouble *listForms[4];  // Tableau de pointeurs vers les listes des pièces ayant la même forme sur le plateau
     ListDouble *listColors[4]; // Tableau de pointeurs vers les listes des pièces ayant la même couleur sur le plateau
+    unsigned int score;
+
+    void removeNode(NodeDouble *);
+    bool isConsecutive(Shape *, Shape *);
+    void checkConsecutive(ListDouble *list);
 
 public:
     Game(); // initialisation du jeu
@@ -112,6 +126,7 @@ public:
     Shape *randShape();
 
     void updateNextShape();
+    void updateScore(unsigned int increase);
 
     void insert(InsertionDirection = INSERT_RIGHT);
 
