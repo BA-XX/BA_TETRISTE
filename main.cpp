@@ -1,26 +1,13 @@
 #include "game.hpp"
 
-void showMenu()
-{
-
-    std::cout << R"( 
-  ____    _      _____ _____ _____ ____  ___ ____ _____ _____ 
- | __ )  / \    |_   _| ____|_   _|  _ \|_ _/ ___|_   _| ____|
- |  _ \ / _ \     | | |  _|   | | | |_) || |\___ \ | | |  _|  
- | |_) / ___ \    | | | |___  | | |  _ < | | ___) || | | |___ 
- |____/_/   \_\___|_| |_____| |_| |_| \_\___|____/ |_| |_____| v1.0
-             |_____|                                          
-
-  @BA_XX         
-)" << std::endl;
-}
-
 int main()
 {
 
     ListSimple plateau;
 
     Game game;
+
+    game.displayMenu();
 
     while (char c = getch())
     {
@@ -31,6 +18,9 @@ int main()
             break;
         case 100:          // d
             game.insert(); // par default INSERT_RIGHT
+            break;
+        case 115: // s
+            game.leftShiftForms(square);
             break;
         }
     }

@@ -20,9 +20,12 @@ public:
     void remove();
 
     void setCoord(short x, short y);
+    void setCoord(COORD);
     COORD getCoord();
 
     void move(short x, short y = 0);
+    void exchangeWith(Shape *);
+
     Color getColor();
     Form getForm();
 };
@@ -57,7 +60,11 @@ public:
     void add(NodeSimple *, InsertionDirection);
     void remove(NodeSimple *);
 
+    void exchange(NodeSimple *, NodeSimple *);
+
     bool isLast(NodeSimple *);
+
+    NodeSimple *getLast();
 
     NodeSimple *findPrev(NodeSimple *);
 
@@ -75,6 +82,8 @@ public:
     NodeDouble(NodeSimple *);
 
     NodeSimple *getNode();
+
+    void exchangeWith(NodeDouble *);
 
     void setPrev(NodeDouble *);
     NodeDouble *getPrev();
@@ -100,6 +109,7 @@ public:
     void removeByNode(NodeSimple *);
     NodeDouble *findByNode(NodeSimple *);
 
+    void setLast(NodeDouble *);
     NodeDouble *getLast();
 
     size_t getSize();
@@ -113,9 +123,10 @@ class Game
     ListDouble *listColors[4]; // Tableau de pointeurs vers les listes des pièces ayant la même couleur sur le plateau
     unsigned int score;
 
-    void removeNode(NodeDouble *);
+    void removeNode(NodeSimple *);
     bool isConsecutive(Shape *, Shape *);
-    void checkConsecutive(ListDouble *list);
+    void checkConsecutive();
+    void leftShift(ListDouble *list); // decalage a gauche
 
 public:
     Game(); // initialisation du jeu
@@ -130,5 +141,9 @@ public:
 
     void insert(InsertionDirection = INSERT_RIGHT);
 
+    void leftShiftForms(Form form);    // decalage a gauche
+    void leftShiftColors(Color color); // decalage a gauche
+
+    void displayMenu();
     void displayGameOver();
 };

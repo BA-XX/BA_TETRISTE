@@ -84,6 +84,11 @@ NodeDouble *ListDouble::findByNode(NodeSimple *node)
 
     return NULL;
 }
+
+void ListDouble::setLast(NodeDouble *node)
+{
+    last = node;
+}
 NodeDouble *ListDouble::getLast()
 {
     return last;

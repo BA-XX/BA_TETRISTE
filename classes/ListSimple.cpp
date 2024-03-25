@@ -124,11 +124,40 @@ void ListSimple::remove(NodeSimple *node)
     size--;
 }
 
+void ListSimple::exchange(NodeSimple *node1, NodeSimple *node2)
+{
+    if (node1 == node2)
+        return;
+
+    NodeSimple *tempPrev1 = findPrev(node1);
+    NodeSimple *tempPrev2 = findPrev(node2);
+
+    NodeSimple *tempNext = node1->getNext();
+
+    tempPrev1->setNext(node2);
+    tempPrev2->setNext(node1);
+
+    node1->setNext(node2->getNext());
+    node2->setNext(tempNext);
+
+    if (isLast(node1))
+        last = node2;
+
+    if (isLast(node2))
+        last = node1;
+
+    node1->getShape()->exchangeWith(node2->getShape());
+}
+
 bool ListSimple::isLast(NodeSimple *node)
 {
     return last == node;
 }
 
+NodeSimple *ListSimple::getLast()
+{
+    return last;
+}
 NodeSimple *ListSimple::findPrev(NodeSimple *node)
 {
     if (isEmpty())

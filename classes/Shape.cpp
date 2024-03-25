@@ -9,7 +9,7 @@ Shape::Shape(Form form, Color color, short x, short y)
 
 Shape::~Shape()
 {
-    //remove(); // enlever le point du console
+    // remove(); // enlever le point du console
 }
 
 void Shape::display()
@@ -36,7 +36,10 @@ void Shape::setCoord(short x, short y)
 {
     coord = {x, y};
 }
-
+void Shape::setCoord(COORD coord)
+{
+    this->coord = coord;
+}
 COORD Shape::getCoord()
 {
     return coord;
@@ -55,6 +58,16 @@ void Shape::move(short x, short y)
     this->display();      // afficher
 }
 
+void Shape::exchangeWith(Shape *shape) // échanger la piece invoqué avec une autre
+{
+    COORD temp = shape->getCoord();
+
+    shape->setCoord(coord);
+    shape->display();
+
+    coord = temp;
+    display();
+}
 Color Shape::getColor()
 {
     return color;

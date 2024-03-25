@@ -1,56 +1,51 @@
 #include "../game.hpp"
 
-void Game::removeNode(NodeDouble *node)
+void Game::removeNode(NodeSimple *node)
 {
-    /* TODO : Amélioration en termes de rapidité :
-       Actuellement, chaque fois qu'il est nécessaire de trouver un nœud,
-       il faut parcourir toute la liste.
-       Cependant, on peut, par exemple, récupérer la liste concernée et la parcourir.
-       Par exemple, si l'on trouve des pièces consécutives dans la liste des carrés,
-       il faut la récupérer avec le type de la liste (formes), puis rechercher dans la liste des couleurs. */
-
-    NodeSimple *temp = node->getNode();
-
     // supprimer le nœud de la liste des formes et des couleurs
-    listForms[node->getNode()->getShape()->getForm()]->removeByNode(temp);
-    listColors[node->getNode()->getShape()->getColor()]->removeByNode(temp);
+    listForms[node->getShape()->getForm()]->removeByNode(node);
+    listColors[node->getShape()->getColor()]->removeByNode(node);
 
     // supprimer le noeud du plateu
-    plateau->remove(temp);
+    plateau->remove(node);
 }
 bool Game::isConsecutive(Shape *first, Shape *second)
 {
-    return (second->getCoord().X - first->getCoord().X) == 1;
+    return (abs(second->getCoord().X - first->getCoord().X)) == 1;
 }
 
-void Game::checkConsecutive(ListDouble *list)
+void Game::checkConsecutive()
 {
-    if (list->getSize() < 3 || list->isEmpty())
-        return;
 
-    NodeDouble *temp = list->getLast()->getNext();
+    NodeSimple *temp = plateau->getLast()->getNext(); // first element
 
-    int numConsective = 1;
+    int numConsecutiveFroms = 1;
+    int numConsecutiveColors = 1;
 
-    while (temp != list->getLast() && !list->isEmpty())
+    while (temp != plateau->getLast() && !plateau->isEmpty())
     {
-        if (isConsecutive(temp->getNode()->getShape(), temp->getNext()->getNode()->getShape()))
-            numConsective++;
+        if (temp->getShape()->getForm() == temp->getNext()->getShape()->getForm())
+            numConsecutiveFroms++;
         else
-            numConsective = 1;
+            numConsecutiveFroms = 1;
 
-        if (numConsective == 3)
+        if (temp->getShape()->getColor() == temp->getNext()->getShape()->getColor())
+            numConsecutiveColors++;
+        else
+            numConsecutiveColors = 1;
+
+        if (numConsecutiveFroms == 3 || numConsecutiveColors == 3)
         {
 
             removeNode(temp->getNext());
-            removeNode(temp->getPrev());
+            removeNode(plateau->findPrev(temp));
             removeNode(temp);
 
             updateScore(30); // augmenter le score de 30
 
-            numConsective = 1; // reintialiser le conteur des forms consectives
+            numConsecutiveFroms = numConsecutiveColors = 1; // reintialiser les conteurs
 
-            if (list->isEmpty())
+            if (plateau->isEmpty())
                 break;
         }
 
@@ -58,8 +53,45 @@ void Game::checkConsecutive(ListDouble *list)
     }
 }
 
+void Game::leftShift(ListDouble *list)
+{
+
+    if (list->isEmpty() || list->getSize() == 1)
+        return;
+
+    NodeDouble *newLast = list->getLast()->getNext(); // premier de la list
+    NodeDouble *temp = newLast->getNext(); 
+
+    while (temp->getNext() !=  newLast->getNext())
+    {
+        plateau->exchange(newLast->getNode(), temp->getNode());
+        temp = temp->getNext();
+    }
+
+    list->setLast(newLast);
+}
+
 Game::Game()
 {
+}
+Game::~Game()
+{
+    delete plateau;
+
+    for (int i = 0; i < 4; i++)
+    { // liberation de la memoire
+        delete listForms[i];
+        delete listColors[i];
+    }
+}
+Shape *Game::randShape()
+{
+    return new Shape(randForm(), randColor());
+}
+
+void Game::start()
+{
+    system("cls");
 
     score = 0;
 
@@ -83,25 +115,6 @@ Game::Game()
 
     std::cout << "\n\n\nPlateau : ";
     plateau->display();
-}
-Game::~Game()
-{
-    delete plateau;
-
-    for (int i = 0; i < 4; i++)
-    { // liberation de la memoire
-        delete listForms[i];
-        delete listColors[i];
-    }
-}
-Shape *Game::randShape()
-{
-    return new Shape(randForm(), randColor());
-}
-
-void Game::start()
-{
-    system("cls");
 }
 
 void Game::updateNextShape()
@@ -129,8 +142,7 @@ void Game::insert(InsertionDirection dir)
     plateau->add(temp, dir);
     plateau->display();
 
-    checkConsecutive(listForms[nextShape->getForm()]);   // les pièces ont les mêmes formes
-    checkConsecutive(listColors[nextShape->getColor()]); // les pièces ont les mêmes couleurs
+    checkConsecutive(); // vérifier les pièces consécutives
 
     // vérifier si la taille du plateau est égale au maximum afin que le jeu d'affichage soit terminé
     if (plateau->getSize() == MAX_PLATEAU_SIZE)
@@ -142,6 +154,46 @@ void Game::insert(InsertionDirection dir)
     updateNextShape();
 }
 
+void Game::leftShiftForms(Form form)
+{
+    leftShift(listForms[form]);
+}
+void Game::leftShiftColors(Color color)
+{
+    leftShift(listColors[color]);
+}
+
+void Game::displayMenu()
+{
+    system("cls");
+
+    short choix;
+
+    std::cout << R"( 
+  ____    _      _____ _____ _____ ____  ___ ____ _____ _____ 
+ | __ )  / \    |_   _| ____|_   _|  _ \|_ _/ ___|_   _| ____|
+ |  _ \ / _ \     | | |  _|   | | | |_) || |\___ \ | | |  _|  
+ | |_) / ___ \    | | | |___  | | |  _ < | | ___) || | | |___ 
+ |____/_/   \_\___|_| |_____| |_| |_| \_\___|____/ |_| |_____| v1.0
+             |_____|                                           @BA_XX                      
+                                                                        
+)" << std::endl;
+
+    std::cout << "1. Nouveau Jeu " << std::endl;
+    std::cout << "0. Quitter";
+    std::cout << "\n\nQuel est votre choix ? :";
+    std::cin >> choix;
+
+    switch (choix)
+    {
+    case 1:
+        start();
+        break;
+    case 0:
+        exit(0);
+        break;
+    }
+}
 void Game::displayGameOver()
 {
 
