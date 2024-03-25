@@ -14,15 +14,7 @@ Shape::~Shape()
 
 void Shape::display()
 {
-
-    // Change la couleur du texte
-    SetConsoleTextAttribute(hConsole, convertToColorCode(color));
-    // Déplacer le curseur
-    SetConsoleCursorPosition(hConsole, coord);
-
-    std::cout << convertFormToSymbole(form);
-    // Rétablit les attributs de couleur d'origine
-    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+    printWithColorAt(convertFormToSymbole(form), convertToColorCode(color), coord);
 }
 
 void Shape::remove()
@@ -49,7 +41,7 @@ void Shape::move(short x, short y)
 {
     if (x < 0 || y < 0)
     {
-        std::cout << "\n\n\n\nnegative";
+        std::cout << "\n\n\n\nnegative + " << convertFormToSymbole(form);
         return;
     }
 

@@ -4,7 +4,6 @@
 
 const short PLATEAU_POS_Y = 4; // definir l'emplacement du plateau
 const short MAX_PLATEAU_SIZE = 15;
-const HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 class Shape
 {
@@ -83,8 +82,6 @@ public:
 
     NodeSimple *getNode();
 
-    void exchangeWith(NodeDouble *);
-
     void setPrev(NodeDouble *);
     NodeDouble *getPrev();
 
@@ -122,6 +119,7 @@ class Game
     ListDouble *listForms[4];  // Tableau de pointeurs vers les listes des pièces ayant la même forme sur le plateau
     ListDouble *listColors[4]; // Tableau de pointeurs vers les listes des pièces ayant la même couleur sur le plateau
     unsigned int score;
+    bool gameOver;
 
     void removeNode(NodeSimple *);
     bool isConsecutive(Shape *, Shape *);
@@ -133,6 +131,7 @@ public:
     ~Game();
 
     void start(); // lancer un nouveau jeu
+    void reset();
 
     Shape *randShape();
 
@@ -146,4 +145,5 @@ public:
 
     void displayMenu();
     void displayGameOver();
+
 };

@@ -92,6 +92,18 @@ int convertToColorCode(Color color)
     return FOREGROUND_RED;
 }
 
+void printWithColorAt(String text , int color, COORD coord)
+{
+    // Change la couleur du texte
+    SetConsoleTextAttribute(hConsole, color);
+    // Déplacer le curseur
+    SetConsoleCursorPosition(hConsole, coord);
+
+    std::cout << text;
+    // Rétablit les attributs de couleur d'origine
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
+
 int abs(int num)
 {
     return (num < 0) ? -num : num;

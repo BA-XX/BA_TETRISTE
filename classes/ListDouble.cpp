@@ -32,15 +32,16 @@ void ListDouble::add(NodeSimple *node, InsertionDirection dir)
     last->setNext(temp);
 
     if (dir == INSERT_RIGHT)
-    {
         last = temp;
-    }
 
     size++;
 }
 
 void ListDouble::remove(NodeDouble *node)
 {
+    if (isEmpty())
+        return;
+
     if (size == 1)
     {
         delete node;
@@ -56,12 +57,10 @@ void ListDouble::remove(NodeDouble *node)
     next->setPrev(prev);
 
     if (isLast(node))
-    {
         last = prev;
-    }
 
-    delete node;
     size--;
+    delete node;
 }
 
 void ListDouble::removeByNode(NodeSimple *node)

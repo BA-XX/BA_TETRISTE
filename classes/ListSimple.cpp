@@ -100,7 +100,7 @@ void ListSimple::remove(NodeSimple *node)
 
     if (isLast(node)) // s'il est le dernier
     {
-        prev->setNext(node->getNext()); // changer le suivante du precedent
+        prev->setNext(last->getNext()); // changer le suivante
 
         delete last; // liberer l'espace de dernier element
 
@@ -112,21 +112,24 @@ void ListSimple::remove(NodeSimple *node)
 
     NodeSimple *temp = node->getNext();
 
-    do
+    while (!isLast(temp))
     {
         temp->getShape()->move(temp->getShape()->getCoord().X - 1, PLATEAU_POS_Y);
         temp = temp->getNext();
+    }
 
-    } while (temp != last->getNext());
+    // pour le dernier element
+    last->getShape()->move(temp->getShape()->getCoord().X - 1, PLATEAU_POS_Y);
 
     prev->setNext(node->getNext()); // changer le suivante du precedent
-    delete node;                    // liberer la memoire
     size--;
+
+    delete node; // liberer la memoire
 }
 
 void ListSimple::exchange(NodeSimple *node1, NodeSimple *node2)
 {
-    if (node1 == node2)
+    if (node1 == node2 || size == 1 || isEmpty())
         return;
 
     NodeSimple *tempPrev1 = findPrev(node1);

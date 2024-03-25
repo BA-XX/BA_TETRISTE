@@ -9,6 +9,7 @@ void Game::removeNode(NodeSimple *node)
     // supprimer le noeud du plateu
     plateau->remove(node);
 }
+
 bool Game::isConsecutive(Shape *first, Shape *second)
 {
     return (abs(second->getCoord().X - first->getCoord().X)) == 1;
@@ -45,8 +46,14 @@ void Game::checkConsecutive()
 
             numConsecutiveFroms = numConsecutiveColors = 1; // reintialiser les conteurs
 
-            if (plateau->isEmpty())
+            if (plateau->isEmpty()) // quiter la boucle si le plateau est vide
                 break;
+            else
+            {
+                // reintialiser la boucle pour commencer du nouveau premier
+                temp = plateau->getLast()->getNext();
+                continue;
+            }
         }
 
         temp = temp->getNext();
@@ -55,14 +62,13 @@ void Game::checkConsecutive()
 
 void Game::leftShift(ListDouble *list)
 {
-
     if (list->isEmpty() || list->getSize() == 1)
         return;
 
     NodeDouble *newLast = list->getLast()->getNext(); // premier de la list
-    NodeDouble *temp = newLast->getNext(); 
+    NodeDouble *temp = newLast->getNext();
 
-    while (temp->getNext() !=  newLast->getNext())
+    while (temp != newLast)
     {
         plateau->exchange(newLast->getNode(), temp->getNode());
         temp = temp->getNext();
@@ -94,6 +100,7 @@ void Game::start()
     system("cls");
 
     score = 0;
+    gameOver = false;
 
     for (int i = 0; i < 4; i++)
     { // allocation de memoire
@@ -115,8 +122,66 @@ void Game::start()
 
     std::cout << "\n\n\nPlateau : ";
     plateau->display();
+
+    while (!gameOver)
+    {
+        switch (getch())
+        {
+        case 108: // l
+            insert(INSERT_LEFT);
+            break;
+        case 114:     // r
+            insert(); // par default INSERT_RIGHT
+            break;
+
+            /*Left shift by forms*/
+
+        case 115: // s
+            leftShiftForms(square);
+            break;
+        case 116: // t
+            leftShiftForms(triangle);
+            break;
+        case 99: // c
+            leftShiftForms(circle);
+            break;
+        case 100: // d
+            leftShiftForms(diamond);
+            break;
+
+            /*Left shift by colors*/
+        case 82: // R
+            leftShiftColors(red);
+            break;
+        case 66: // B
+            leftShiftColors(blue);
+            break;
+        case 89: // Y
+            leftShiftColors(yellow);
+            break;
+        case 71: // G
+            leftShiftColors(green);
+            break;
+        }
+    }
 }
 
+void Game::reset()
+{
+    score = 0;
+
+    for (int i = 0; i < 4; i++)
+    { // liberation de la memoire
+        delete listForms[i];
+        delete listColors[i];
+    }
+
+    // réinitialiser le generateur de nombre aléatoire
+    std::srand(std::time(nullptr));
+
+    // supprimer le plateau
+    delete plateau;
+}
 void Game::updateNextShape()
 {
     nextShape = randShape();
@@ -157,10 +222,12 @@ void Game::insert(InsertionDirection dir)
 void Game::leftShiftForms(Form form)
 {
     leftShift(listForms[form]);
+    checkConsecutive();
 }
 void Game::leftShiftColors(Color color)
 {
     leftShift(listColors[color]);
+    checkConsecutive();
 }
 
 void Game::displayMenu()
@@ -196,8 +263,10 @@ void Game::displayMenu()
 }
 void Game::displayGameOver()
 {
+    gameOver = true;
 
     system("cls");
+    short choix;
 
     std::cout << R"(
    _____                         ____                   _ 
@@ -206,6 +275,12 @@ void Game::displayGameOver()
  | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__| | |
  | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |    |_|
   \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|    (_)
-                                                                                                           
+                                                                                       
     )" << std::endl;
+
+    std::cout << "                      Score: " << score << std::endl;
+    std::cout << "\n\n\n## cliquez sur n'importe quelle touche pour revenir au menu ##" << std::endl;
+    getch();
+    reset();
+    displayMenu();
 }
