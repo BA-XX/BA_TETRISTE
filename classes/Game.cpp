@@ -2,6 +2,7 @@
 
 void Game::removeNode(NodeSimple *node)
 {
+
     // supprimer le nœud de la liste des formes et des couleurs
     listForms[node->getShape()->getForm()]->removeByNode(node);
     listColors[node->getShape()->getColor()]->removeByNode(node);
@@ -47,7 +48,7 @@ void Game::checkConsecutive(bool (Game::*compFunc)(Shape *first, Shape *second))
 
             if (plateau->isEmpty()) // quiter la boucle si le plateau est vide
             {
-                updateScore(100); // Bonus si le plateau est vidée
+                updateScore(100); // Bonus si le plateau est videe
                 break;
             }
             else
@@ -124,7 +125,7 @@ void Game::start()
         listColors[i] = new ListDouble();
     }
 
-    // réinitialiser le generateur de nombre aléatoire
+    // reinitialiser le generateur de nombre aleatoire
     std::srand(std::time(nullptr));
 
     // initialiser le prochain
@@ -194,7 +195,7 @@ void Game::reset()
         delete listColors[i];
     }
 
-    // réinitialiser le generateur de nombre aléatoire
+    // reinitialiser le generateur de nombre aleatoire
     std::srand(std::time(nullptr));
 
     // supprimer le plateau
@@ -225,9 +226,9 @@ void Game::insert(InsertionDirection dir)
     plateau->add(temp, dir);
     plateau->display();
 
-    removeConsecutives(); // vérifier les pièces consécutives
+    removeConsecutives(); // verifier les pieces consecutives
 
-    // vérifier si la taille du plateau est égale au maximum afin que le jeu d'affichage soit terminé
+    // verifier si la taille du plateau est egale au maximum afin que le jeu d'affichage soit termine
     if (plateau->getSize() == MAX_PLATEAU_SIZE)
     {
         this->displayGameOver();
@@ -264,15 +265,20 @@ void Game::displayMenu()
                                                                         
 )" << std::endl;
 
-    std::cout << "1. Nouveau Jeu " << std::endl;
-    std::cout << "0. Quitter";
-    std::cout << "\n\nQuel est votre choix ? :";
+    std::cout << "  1. Nouveau Jeu " << std::endl;
+    std::cout << "  2. Meilleurs scores " << std::endl;
+    std::cout << "  3. Les regles  " << std::endl;
+    std::cout << "  0. Quitter";
+    std::cout << "\n\n  Quel est votre choix ? :";
     std::cin >> choix;
 
     switch (choix)
     {
     case 1:
         start();
+        break;
+    case 3:
+        displayRules();
         break;
     case 0:
         exit(0);
@@ -296,6 +302,9 @@ void Game::displayGameOver()
                                                                                        
     )" << std::endl;
 
+    if (bestScore())
+        std::cout << "           Bravo ! Nouveau meilleur score" << std::endl;
+
     std::cout << "                      Score: " << score << std::endl;
     std::cout << "\n\n\n## cliquez sur n'importe quelle touche pour revenir au menu ##" << std::endl;
     getch();
@@ -311,4 +320,93 @@ void Game::displayControlsMenu()
     std::cout << "- t : Decalage des triangles.    - c : Decalage des cercles.        - d : Decalage des losanges " << std::endl;
     std::cout << "- R : Decalage des rouges.       - B : Decalage des blues.          - Y : Decalage des jaunes. " << std::endl;
     std::cout << "- G : Decalage des vertes." << std::endl;
+}
+
+void Game::displayRules()
+{
+    system("cls");
+
+    std::cout << R"(
+______ _   _ _      _____ _____ 
+| ___ \ | | | |    |  ___/  ___|
+| |_/ / | | | |    | |__ \ `--. 
+|    /| | | | |    |  __| `--. \
+| |\ \| |_| | |____| |___/\__/ /
+\_| \_|\___/\_____/\____/\____/ 
+                                
+# But du jeu : 
+Le joueur doit former des ensembles de trois pieces consecutives ayant la meme couleur ou forme 
+pour les faire disparaitre et gagner des points.
+
+# Deroulement du jeu :
+1. Le jeu commence avec un plateau vide.
+2. A chaque tour, une nouvelle piece est generee aleatoirement.
+3. Le joueur choisit ou placer la nouvelle piece sur le plateau.
+4. Si le joueur reussit a former un groupe de trois pieces consecutives ayant la meme couleur ou 
+   forme, ces trois pieces sont retirees du plateau, et le joueur recoit 10 points pour chaque 
+   piece ainsi retiree.
+5. Si le plateau est vide, le joueur recoit un bonus de 100 points.
+6. Le jeu se poursuit jusqu'a ce que le plateau contienne 15 pieces.
+
+# Conditions de fin du jeu : 
+Le jeu se termine lorsque le plateau contient 15 pieces. Le score total du joueur est calcule 
+en ajoutant les points obtenus pour chaque piece retiree et les bonus de 100 points chaque fois 
+que le plateau est vide.
+
+# Objectif : 
+Atteindre le meilleur score en planifiant strategiquement l'insertion ou le decalage des pieces.
+
+                                )"
+              << std::endl;
+
+    std::cout << "# Controles :" << std::endl;
+    std::cout << "- l : Ajouter a gauche." << std::endl;
+    std::cout << "- r : Ajouter a droite." << std::endl;
+    std::cout << "- s : Decalage des carres." << std::endl;
+    std::cout << "- t : Decalage des triangles." << std::endl;
+    std::cout << "- c : Decalage des cercles." << std::endl;
+    std::cout << "- d : Decalage des losanges." << std::endl;
+    std::cout << "- R : Decalage des pieces rouges." << std::endl;
+    std::cout << "- B : Decalage des pieces bleues." << std::endl;
+    std::cout << "- Y : Decalage des pieces jaunes." << std::endl;
+    std::cout << "- G : Decalage des pieces vertes." << std::endl
+              << std::endl;
+
+    std::cout << "\n\n\n## cliquez sur n'importe quelle touche pour revenir au menu ##" << std::endl;
+    SetConsoleCursorPosition(hConsole, {0, 0});
+
+    getch();
+    displayMenu();
+}
+
+bool Game::bestScore()
+{
+    if (score == 0)
+        return false;
+
+    std::vector<int> scores = loadArray(SCORE_FILE_NAME);
+
+    if (scores.size() <= 10)
+    {
+        scores[scores.size()] = score;
+        saveArray(scores, SCORE_FILE_NAME); // savaugarder les nouveaux scores
+
+        return true;
+    }
+
+    for (int i = 0; i < scores.size(); ++i)
+    {
+        if (scores[i] < score)
+        {
+            for (int j = i; j < (scores.size() - 1); j++)
+                scores[j + 1] = scores[j];
+            scores[i] = score;
+
+            saveArray(scores, SCORE_FILE_NAME); // savaugarder les nouveaux scores
+
+            return true;
+        }
+    }
+
+    return false;
 }

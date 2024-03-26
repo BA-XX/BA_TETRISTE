@@ -92,7 +92,7 @@ int convertToColorCode(Color color)
     return FOREGROUND_RED;
 }
 
-void printWithColorAt(String text , int color, COORD coord)
+void printWithColorAt(String text, int color, COORD coord)
 {
     // Change la couleur du texte
     SetConsoleTextAttribute(hConsole, color);
@@ -104,7 +104,41 @@ void printWithColorAt(String text , int color, COORD coord)
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
-int abs(int num)
+// Function pour savaugarder un tableau d'entiers dans un fichier
+void saveArray(const std::vector<int> &array, const std::string &fileName)
 {
-    return (num < 0) ? -num : num;
+    std::ofstream outputFile(fileName);
+    if (outputFile.is_open())
+    {
+        for (int i = 0; i < array.size(); ++i)
+        {
+            outputFile << array[i] << " ";
+        }
+        outputFile.close();
+    }
+}
+
+// Function pour retirer un tableau d'entiers d'un fichier
+std::vector<int> loadArray(const std::string &fileName)
+{
+    std::ifstream inputFile(fileName);
+    std::vector<int> loadedArray;
+
+    if (inputFile.is_open())
+    {
+        int value;
+        while (inputFile >> value)
+        {
+            loadedArray.push_back(value);
+        }
+        inputFile.close();
+    }
+    else
+    {
+        // si le fichier n'exist pas
+        saveArray(loadedArray, fileName); // creer un nouveau fichier
+        loadArray(fileName);
+    }
+
+    return loadedArray;
 }

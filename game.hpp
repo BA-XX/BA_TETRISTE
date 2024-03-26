@@ -6,6 +6,7 @@ const short PLATEAU_POS_Y = 4; // definir l'emplacement du plateau
 const short MAX_PLATEAU_SIZE = 15;
 const short MAX_CONSECUTVIES_PIECES = 3;
 const short SCORE_REWARD_COEFFICIENT = 10; // coefficient multiplicateur pour chaque pièce consécutive éliminée
+const String SCORE_FILE_NAME = "scores.txt";
 
 class Shape
 {
@@ -153,6 +154,8 @@ public:
     void displayMenu();
     void displayGameOver();
     void displayControlsMenu();
+    void displayRules();
 
+    bool bestScore();
 
 };

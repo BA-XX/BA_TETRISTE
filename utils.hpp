@@ -4,6 +4,8 @@
 #include <conio.h>
 #include <windows.h>
 #include <ctime>
+#include <fstream>
+#include <vector>
 
 typedef std::string String;
 
@@ -38,4 +40,5 @@ String convertFormToSymbole(Form form);
 int convertToColorCode(Color color);
 void printWithColorAt(String text , int color , COORD coord);
 
-int abs(int num); // calcul la valeur absulue d'un nombre
+void saveArray(const std::vector<int>& array, const std::string& fileName);
+std::vector<int> loadArray(const std::string& fileName);
