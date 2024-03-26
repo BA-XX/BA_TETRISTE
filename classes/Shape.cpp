@@ -41,7 +41,6 @@ void Shape::move(short x, short y)
 {
     if (x < 0 || y < 0)
     {
-        std::cout << "\n\n\n\nnegative + " << convertFormToSymbole(form);
         return;
     }
 

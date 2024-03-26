@@ -4,6 +4,8 @@
 
 const short PLATEAU_POS_Y = 4; // definir l'emplacement du plateau
 const short MAX_PLATEAU_SIZE = 15;
+const short MAX_CONSECUTVIES_PIECES = 3;
+const short SCORE_REWARD_COEFFICIENT = 10; // coefficient multiplicateur pour chaque pièce consécutive éliminée
 
 class Shape
 {
@@ -122,9 +124,12 @@ class Game
     bool gameOver;
 
     void removeNode(NodeSimple *);
-    bool isConsecutive(Shape *, Shape *);
-    void checkConsecutive();
+    void checkConsecutive(bool (Game::*compFunc)(Shape* , Shape*));
+    void removeConsecutives();
     void leftShift(ListDouble *list); // decalage a gauche
+
+    bool compConsecutivesForms(Shape* , Shape*);
+    bool compConsecutivesColors(Shape* , Shape*);
 
 public:
     Game(); // initialisation du jeu
@@ -143,7 +148,11 @@ public:
     void leftShiftForms(Form form);    // decalage a gauche
     void leftShiftColors(Color color); // decalage a gauche
 
+    void deleteConsecutive(NodeSimple *first , int numsuccessive);
+
     void displayMenu();
     void displayGameOver();
+    void displayControlsMenu();
+
 
 };

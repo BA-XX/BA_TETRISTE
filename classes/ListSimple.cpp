@@ -132,16 +132,36 @@ void ListSimple::exchange(NodeSimple *node1, NodeSimple *node2)
     if (node1 == node2 || size == 1 || isEmpty())
         return;
 
-    NodeSimple *tempPrev1 = findPrev(node1);
-    NodeSimple *tempPrev2 = findPrev(node2);
+    NodeSimple *prev1 = findPrev(node1);
+    NodeSimple *prev2 = findPrev(node2);
 
-    NodeSimple *tempNext = node1->getNext();
+    NodeSimple *next1 = node1->getNext();
+    NodeSimple *next2 = node2->getNext();
 
-    tempPrev1->setNext(node2);
-    tempPrev2->setNext(node1);
 
-    node1->setNext(node2->getNext());
-    node2->setNext(tempNext);
+    if (next1 != node2 && next2 != node1)
+    {
+        node1->setNext(next2);
+        node2->setNext(next1);
+        
+        prev1->setNext(node2);
+        prev2->setNext(node1);
+
+    }
+    else if (next1 == node2 && next2 != node1)
+    {
+        node2->setNext(node1);
+        node1->setNext(next2);
+
+        prev1->setNext(node2);
+    }
+    else if (next2 == node1 && next1 != node2)
+    {
+        node1->setNext(node2);
+        node2->setNext(next1);
+
+        prev2->setNext(node1);
+    }
 
     if (isLast(node1))
         last = node2;
@@ -150,6 +170,7 @@ void ListSimple::exchange(NodeSimple *node1, NodeSimple *node2)
         last = node1;
 
     node1->getShape()->exchangeWith(node2->getShape());
+
 }
 
 bool ListSimple::isLast(NodeSimple *node)
@@ -166,12 +187,20 @@ NodeSimple *ListSimple::findPrev(NodeSimple *node)
     if (isEmpty())
         return NULL;
 
-    NodeSimple *prev = last->getNext(); // commencer depuis le premier element
+    if (last->getNext() == node) // premier element
+        return last;
 
-    while (prev->getNext() != node)
-        prev = prev->getNext();
+    NodeSimple *temp = last->getNext();
 
-    return prev;
+    while (temp != last)
+    {
+        if (temp->getNext() == node)
+            return temp;
+
+        temp = temp->getNext();
+    }
+
+    return NULL;
 }
 size_t ListSimple::getSize()
 {

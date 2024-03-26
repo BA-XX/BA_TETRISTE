@@ -10,48 +10,50 @@ void Game::removeNode(NodeSimple *node)
     plateau->remove(node);
 }
 
-bool Game::isConsecutive(Shape *first, Shape *second)
+void Game::checkConsecutive(bool (Game::*compFunc)(Shape *first, Shape *second))
 {
-    return (abs(second->getCoord().X - first->getCoord().X)) == 1;
-}
+    if (plateau->getSize() < MAX_CONSECUTVIES_PIECES || plateau->isEmpty())
+        return;
 
-void Game::checkConsecutive()
-{
+    NodeSimple *first, *temp;
+    first = temp = plateau->getLast()->getNext(); // first element
 
-    NodeSimple *temp = plateau->getLast()->getNext(); // first element
-
-    int numConsecutiveFroms = 1;
-    int numConsecutiveColors = 1;
+    int numConsecutive = 1;
 
     while (temp != plateau->getLast() && !plateau->isEmpty())
     {
-        if (temp->getShape()->getForm() == temp->getNext()->getShape()->getForm())
-            numConsecutiveFroms++;
+        if ((this->*compFunc)(temp->getShape(), temp->getNext()->getShape()))
+            numConsecutive++;
         else
-            numConsecutiveFroms = 1;
-
-        if (temp->getShape()->getColor() == temp->getNext()->getShape()->getColor())
-            numConsecutiveColors++;
-        else
-            numConsecutiveColors = 1;
-
-        if (numConsecutiveFroms == 3 || numConsecutiveColors == 3)
         {
+            numConsecutive = 1;
+            first = temp->getNext();
+        }
 
-            removeNode(temp->getNext());
-            removeNode(plateau->findPrev(temp));
-            removeNode(temp);
+        if (numConsecutive >= MAX_CONSECUTVIES_PIECES)
+        {
+            NodeSimple *temp2 = first;
 
-            updateScore(30); // augmenter le score de 30
+            for (int i = 0; i < numConsecutive; i++)
+            {
+                removeNode(temp2);
 
-            numConsecutiveFroms = numConsecutiveColors = 1; // reintialiser les conteurs
+                temp2 = temp2->getNext();
+            }
+
+            updateScore(numConsecutive * SCORE_REWARD_COEFFICIENT); // augmenter le score de 30
+
+            numConsecutive = 1; // reintialiser les conteurs
 
             if (plateau->isEmpty()) // quiter la boucle si le plateau est vide
+            {
+                updateScore(100); // Bonus si le plateau est vidée
                 break;
+            }
             else
             {
                 // reintialiser la boucle pour commencer du nouveau premier
-                temp = plateau->getLast()->getNext();
+                first = temp = plateau->getLast()->getNext();
                 continue;
             }
         }
@@ -60,6 +62,11 @@ void Game::checkConsecutive()
     }
 }
 
+void Game::removeConsecutives()
+{
+    checkConsecutive(compConsecutivesForms);
+    checkConsecutive(compConsecutivesColors);
+}
 void Game::leftShift(ListDouble *list)
 {
     if (list->isEmpty() || list->getSize() == 1)
@@ -75,6 +82,15 @@ void Game::leftShift(ListDouble *list)
     }
 
     list->setLast(newLast);
+}
+
+bool Game::compConsecutivesForms(Shape *first, Shape *second)
+{
+    return first->getForm() == second->getForm();
+}
+bool Game::compConsecutivesColors(Shape *first, Shape *second)
+{
+    return first->getColor() == second->getColor();
 }
 
 Game::Game()
@@ -113,15 +129,17 @@ void Game::start()
 
     // initialiser le prochain
     std::cout << "Prochain :";
-    this->updateNextShape();
 
-    updateScore(0); // afficher score
+    updateNextShape(); // gener une nouvelle piece
+    updateScore(0);    // afficher score
 
     // initialiser le plateau
     plateau = new ListSimple();
 
     std::cout << "\n\n\nPlateau : ";
     plateau->display();
+
+    displayControlsMenu();
 
     while (!gameOver)
     {
@@ -192,7 +210,7 @@ void Game::updateNextShape()
 void Game::updateScore(unsigned int increase)
 {
 
-    SetConsoleCursorPosition(hConsole, {40, 0});
+    SetConsoleCursorPosition(hConsole, {80, 0});
     std::cout << "Score : " << (score += increase);
 }
 
@@ -207,7 +225,7 @@ void Game::insert(InsertionDirection dir)
     plateau->add(temp, dir);
     plateau->display();
 
-    checkConsecutive(); // vérifier les pièces consécutives
+    removeConsecutives(); // vérifier les pièces consécutives
 
     // vérifier si la taille du plateau est égale au maximum afin que le jeu d'affichage soit terminé
     if (plateau->getSize() == MAX_PLATEAU_SIZE)
@@ -222,12 +240,12 @@ void Game::insert(InsertionDirection dir)
 void Game::leftShiftForms(Form form)
 {
     leftShift(listForms[form]);
-    checkConsecutive();
+    removeConsecutives();
 }
 void Game::leftShiftColors(Color color)
 {
     leftShift(listColors[color]);
-    checkConsecutive();
+    removeConsecutives();
 }
 
 void Game::displayMenu()
@@ -283,4 +301,14 @@ void Game::displayGameOver()
     getch();
     reset();
     displayMenu();
+}
+
+void Game::displayControlsMenu()
+{
+    SetConsoleCursorPosition(hConsole, {0, 12});
+    std::cout << "----------------------------------------- Controles ---------------------------------------------" << std::endl;
+    std::cout << "- l : Ajouter a gauche.          - r : Ajouter a droite.            - s : Decalage des carres " << std::endl;
+    std::cout << "- t : Decalage des triangles.    - c : Decalage des cercles.        - d : Decalage des losanges " << std::endl;
+    std::cout << "- R : Decalage des rouges.       - B : Decalage des blues.          - Y : Decalage des jaunes. " << std::endl;
+    std::cout << "- G : Decalage des vertes." << std::endl;
 }

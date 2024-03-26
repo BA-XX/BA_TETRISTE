@@ -65,6 +65,9 @@ void ListDouble::remove(NodeDouble *node)
 
 void ListDouble::removeByNode(NodeSimple *node)
 {
+    if (isEmpty())
+        return;
+        
     NodeDouble *temp = findByNode(node);
 
     if (temp != NULL)
