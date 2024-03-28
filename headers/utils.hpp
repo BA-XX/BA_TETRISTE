@@ -38,7 +38,10 @@ Color randColor();
 Form randForm();
 String convertFormToSymbole(Form form);
 int convertToColorCode(Color color);
-void printWithColorAt(String text , int color , COORD coord);
+void printWithColorAt(String text, int color, COORD coord);
 
-void saveArray(const std::vector<int>& array, const std::string& fileName);
-std::vector<int> loadArray(const std::string& fileName);
+void saveArray(const std::vector<int> &array, const std::string &fileName);
+std::vector<int> loadArray(const std::string &fileName);
+std::vector<int> sort(const std::vector<int> &array);
+
+String readFileToString(const String &filename);

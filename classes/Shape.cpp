@@ -1,4 +1,4 @@
-#include "../game.hpp"
+#include "../headers/game.hpp"
 
 Shape::Shape(Form form, Color color, short x, short y)
 {
@@ -9,7 +9,7 @@ Shape::Shape(Form form, Color color, short x, short y)
 
 Shape::~Shape()
 {
-    // remove(); // enlever le point du console
+    // destructeur
 }
 
 void Shape::display()
@@ -40,9 +40,7 @@ COORD Shape::getCoord()
 void Shape::move(short x, short y)
 {
     if (x < 0 || y < 0)
-    {
         return;
-    }
 
     this->remove();       // effacer
     this->coord = {x, y}; // changer les coordonee

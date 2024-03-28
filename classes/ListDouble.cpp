@@ -1,10 +1,30 @@
-#include "../game.hpp"
+#include "../headers/game.hpp"
 
 ListDouble::ListDouble()
 {
     last = NULL;
     size = 0;
 }
+ListDouble::~ListDouble()
+{
+    if (!isEmpty())
+    {
+        NodeDouble *temp = last->getNext();
+
+        while (!isLast(last))
+        {
+
+            NodeDouble *next = temp->getNext();
+
+            delete temp;
+
+            temp = next;
+        }
+
+        delete last;
+    }
+}
+
 bool ListDouble::isEmpty()
 {
     return last == NULL;
@@ -67,7 +87,7 @@ void ListDouble::removeByNode(NodeSimple *node)
 {
     if (isEmpty())
         return;
-        
+
     NodeDouble *temp = findByNode(node);
 
     if (temp != NULL)

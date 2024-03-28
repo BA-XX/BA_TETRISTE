@@ -1,0 +1,17 @@
+Prochain : S                                                                    Score : 0
+
+
+Plateau :
+
+
+
+
+
+
+
+
+----------------------------------------- Controles ---------------------------------------------
+- <-: Ajouter a gauche.          - ->: Ajouter a droite.            - s : Decalage des carres
+- t : Decalage des triangles.    - c : Decalage des cercles.        - d : Decalage des losanges
+- R : Decalage des rouges.       - B : Decalage des blues.          - Y : Decalage des jaunes.
+- G : Decalage des vertes.       - 0 : Quitterss

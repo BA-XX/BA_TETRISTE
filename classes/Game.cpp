@@ -1,4 +1,4 @@
-#include "../game.hpp"
+#include "../headers/game.hpp"
 
 void Game::removeNode(NodeSimple *node)
 {
@@ -37,9 +37,11 @@ void Game::checkConsecutive(bool (Game::*compFunc)(Shape *first, Shape *second))
 
             for (int i = 0; i < numConsecutive; i++)
             {
-                removeNode(temp2);
+                NodeSimple *next = temp2->getNext(); // stocker la valeur du suivant
 
-                temp2 = temp2->getNext();
+                removeNode(temp2); // supprimer le node actuel
+
+                temp2 = next; // changer la valeur de temp2 par le suivant
             }
 
             updateScore(numConsecutive * SCORE_REWARD_COEFFICIENT); // augmenter le score de 30
@@ -96,6 +98,9 @@ bool Game::compConsecutivesColors(Shape *first, Shape *second)
 
 Game::Game()
 {
+    plateau = NULL;
+    score = 0;
+    gameOver = true;
 }
 Game::~Game()
 {
@@ -125,31 +130,27 @@ void Game::start()
         listColors[i] = new ListDouble();
     }
 
+    std::cout << readFileToString(PLATEAU_FILE_PATH);
     // reinitialiser le generateur de nombre aleatoire
     std::srand(std::time(nullptr));
 
     // initialiser le prochain
-    std::cout << "Prochain :";
-
     updateNextShape(); // gener une nouvelle piece
     updateScore(0);    // afficher score
 
     // initialiser le plateau
     plateau = new ListSimple();
 
-    std::cout << "\n\n\nPlateau : ";
     plateau->display();
-
-    displayControlsMenu();
 
     while (!gameOver)
     {
         switch (getch())
         {
-        case 108: // l
+        case 75: // left arrow key
             insert(INSERT_LEFT);
             break;
-        case 114:     // r
+        case 77:      // right arrow key
             insert(); // par default INSERT_RIGHT
             break;
 
@@ -181,6 +182,12 @@ void Game::start()
         case 71: // G
             leftShiftColors(green);
             break;
+
+        case 48: // 0
+
+            reset();
+            displayMenu();
+            break;
         }
     }
 }
@@ -188,6 +195,7 @@ void Game::start()
 void Game::reset()
 {
     score = 0;
+    gameOver = true;
 
     for (int i = 0; i < 4; i++)
     { // liberation de la memoire
@@ -204,15 +212,15 @@ void Game::reset()
 void Game::updateNextShape()
 {
     nextShape = randShape();
-    nextShape->setCoord(11, 0);
+    nextShape->setCoord(PLATEAU_NEXT_PIECE_X, PLATEAU_NEXT_PIECE_Y);
     nextShape->display();
 }
 
 void Game::updateScore(unsigned int increase)
 {
 
-    SetConsoleCursorPosition(hConsole, {80, 0});
-    std::cout << "Score : " << (score += increase);
+    SetConsoleCursorPosition(hConsole, {PLATEAU_SCORE_X, PLATEAU_SCORE_Y});
+    std::cout << (score += increase);
 }
 
 void Game::insert(InsertionDirection dir)
@@ -253,35 +261,28 @@ void Game::displayMenu()
 {
     system("cls");
 
-    short choix;
+    std::cout << readFileToString(MENU_FILE_PATH);
 
-    std::cout << R"( 
-  ____    _      _____ _____ _____ ____  ___ ____ _____ _____ 
- | __ )  / \    |_   _| ____|_   _|  _ \|_ _/ ___|_   _| ____|
- |  _ \ / _ \     | | |  _|   | | | |_) || |\___ \ | | |  _|  
- | |_) / ___ \    | | | |___  | | |  _ < | | ___) || | | |___ 
- |____/_/   \_\___|_| |_____| |_| |_| \_\___|____/ |_| |_____| v1.0
-             |_____|                                           @BA_XX                      
-                                                                        
-)" << std::endl;
-
-    std::cout << "  1. Nouveau Jeu " << std::endl;
-    std::cout << "  2. Meilleurs scores " << std::endl;
-    std::cout << "  3. Les regles  " << std::endl;
-    std::cout << "  0. Quitter";
-    std::cout << "\n\n  Quel est votre choix ? :";
-    std::cin >> choix;
-
-    switch (choix)
+    while (true)
     {
-    case 1:
-        start();
-        break;
-    case 3:
-        displayRules();
-        break;
-    case 0:
-        exit(0);
+        switch (getch())
+        {
+        case 49: // 1
+            start();
+            break;
+        case 50: // 2
+            displayBestScores();
+            break;
+        case 51: // 3
+            displayRules();
+            break;
+        case 48: // 0
+            exit(0);
+            break;
+        default:
+            continue;
+        }
+
         break;
     }
 }
@@ -292,85 +293,52 @@ void Game::displayGameOver()
     system("cls");
     short choix;
 
-    std::cout << R"(
-   _____                         ____                   _ 
-  / ____|                       / __ \                 | |
- | |  __  __ _ _ __ ___   ___  | |  | |_   _____ _ __  | |
- | | |_ |/ _` | '_ ` _ \ / _ \ | |  | \ \ / / _ \ '__| | |
- | |__| | (_| | | | | | |  __/ | |__| |\ V /  __/ |    |_|
-  \_____|\__,_|_| |_| |_|\___|  \____/  \_/ \___|_|    (_)
-                                                                                       
-    )" << std::endl;
+    std::cout << readFileToString(GAME_OVER_FILE_PATH);
 
     if (bestScore())
-        std::cout << "           Bravo ! Nouveau meilleur score" << std::endl;
+        std::cout << "           Bravo ! Nouveau Meilleur Score" << std::endl;
 
-    std::cout << "                      Score: " << score << std::endl;
+    std::cout << "                      Score: " << score << std::endl
+              << std::endl;
+
+    std::cout << "                ->  Relancer (ESPACE)  <-" << std::endl;
     std::cout << "\n\n\n## cliquez sur n'importe quelle touche pour revenir au menu ##" << std::endl;
-    getch();
-    reset();
-    displayMenu();
-}
-
-void Game::displayControlsMenu()
-{
-    SetConsoleCursorPosition(hConsole, {0, 12});
-    std::cout << "----------------------------------------- Controles ---------------------------------------------" << std::endl;
-    std::cout << "- l : Ajouter a gauche.          - r : Ajouter a droite.            - s : Decalage des carres " << std::endl;
-    std::cout << "- t : Decalage des triangles.    - c : Decalage des cercles.        - d : Decalage des losanges " << std::endl;
-    std::cout << "- R : Decalage des rouges.       - B : Decalage des blues.          - Y : Decalage des jaunes. " << std::endl;
-    std::cout << "- G : Decalage des vertes." << std::endl;
+    switch (getch())
+    {
+    case 32: // espace
+        reset();
+        start();
+        break;
+    default:
+        reset();
+        displayMenu();
+        break;
+    }
 }
 
 void Game::displayRules()
 {
     system("cls");
 
-    std::cout << R"(
-______ _   _ _      _____ _____ 
-| ___ \ | | | |    |  ___/  ___|
-| |_/ / | | | |    | |__ \ `--. 
-|    /| | | | |    |  __| `--. \
-| |\ \| |_| | |____| |___/\__/ /
-\_| \_|\___/\_____/\____/\____/ 
-                                
-# But du jeu : 
-Le joueur doit former des ensembles de trois pieces consecutives ayant la meme couleur ou forme 
-pour les faire disparaitre et gagner des points.
+    std::cout << readFileToString(RULES_FILE_PATH);
 
-# Deroulement du jeu :
-1. Le jeu commence avec un plateau vide.
-2. A chaque tour, une nouvelle piece est generee aleatoirement.
-3. Le joueur choisit ou placer la nouvelle piece sur le plateau.
-4. Si le joueur reussit a former un groupe de trois pieces consecutives ayant la meme couleur ou 
-   forme, ces trois pieces sont retirees du plateau, et le joueur recoit 10 points pour chaque 
-   piece ainsi retiree.
-5. Si le plateau est vide, le joueur recoit un bonus de 100 points.
-6. Le jeu se poursuit jusqu'a ce que le plateau contienne 15 pieces.
+    std::cout << "\n\n\n## cliquez sur n'importe quelle touche pour revenir au menu ##" << std::endl;
+    SetConsoleCursorPosition(hConsole, {0, 0});
 
-# Conditions de fin du jeu : 
-Le jeu se termine lorsque le plateau contient 15 pieces. Le score total du joueur est calcule 
-en ajoutant les points obtenus pour chaque piece retiree et les bonus de 100 points chaque fois 
-que le plateau est vide.
+    getch();
+    displayMenu();
+}
 
-# Objectif : 
-Atteindre le meilleur score en planifiant strategiquement l'insertion ou le decalage des pieces.
+void Game::displayBestScores()
+{
+    system("cls");
 
-                                )"
-              << std::endl;
+    std::cout << readFileToString(TOP_SCORES_FILE_PATH);
 
-    std::cout << "# Controles :" << std::endl;
-    std::cout << "- l : Ajouter a gauche." << std::endl;
-    std::cout << "- r : Ajouter a droite." << std::endl;
-    std::cout << "- s : Decalage des carres." << std::endl;
-    std::cout << "- t : Decalage des triangles." << std::endl;
-    std::cout << "- c : Decalage des cercles." << std::endl;
-    std::cout << "- d : Decalage des losanges." << std::endl;
-    std::cout << "- R : Decalage des pieces rouges." << std::endl;
-    std::cout << "- B : Decalage des pieces bleues." << std::endl;
-    std::cout << "- Y : Decalage des pieces jaunes." << std::endl;
-    std::cout << "- G : Decalage des pieces vertes." << std::endl
-              << std::endl;
+    std::vector<int> scores = sort(loadArray(SCORE_FILE_PATH));
+
+    for (size_t i = 0; i < scores.size(); i++)
+        std::cout << "  " << i + 1 << "- " << scores[i] << std::endl;
 
     std::cout << "\n\n\n## cliquez sur n'importe quelle touche pour revenir au menu ##" << std::endl;
     SetConsoleCursorPosition(hConsole, {0, 0});
@@ -384,27 +352,36 @@ bool Game::bestScore()
     if (score == 0)
         return false;
 
-    std::vector<int> scores = loadArray(SCORE_FILE_NAME);
+    std::vector<int> scores = loadArray(SCORE_FILE_PATH);
 
-    if (scores.size() <= 10)
+    size_t numScores = scores.size();
+
+    int bestScore = (numScores > 0) ? scores[0] : 0;
+
+    if (numScores < 10)
     {
-        scores[scores.size()] = score;
-        saveArray(scores, SCORE_FILE_NAME); // savaugarder les nouveaux scores
+        scores.push_back(score);
 
-        return true;
+        scores = sort(scores);              // trie le tableau
+        saveArray(scores, SCORE_FILE_PATH); // savaugarder les nouveaux scores
+
+        return bestScore < score; // comparer le premier score avec l'actuel score
     }
 
-    for (int i = 0; i < scores.size(); ++i)
+    for (int i = 0; i < numScores; ++i)
     {
         if (scores[i] < score)
         {
-            for (int j = i; j < (scores.size() - 1); j++)
-                scores[j + 1] = scores[j];
-            scores[i] = score;
+            scores.push_back(score);
 
-            saveArray(scores, SCORE_FILE_NAME); // savaugarder les nouveaux scores
+            scores = sort(scores); // trie le tableau
 
-            return true;
+            if (scores.size() > 10)
+                scores.pop_back();
+
+            saveArray(scores, SCORE_FILE_PATH); // savaugarder les nouveaux scores
+
+            return bestScore < score;
         }
     }
 

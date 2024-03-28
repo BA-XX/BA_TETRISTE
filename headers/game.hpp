@@ -2,11 +2,23 @@
 
 #include "utils.hpp"
 
-const short PLATEAU_POS_Y = 4; // definir l'emplacement du plateau
 const short MAX_PLATEAU_SIZE = 15;
 const short MAX_CONSECUTVIES_PIECES = 3;
 const short SCORE_REWARD_COEFFICIENT = 10; // coefficient multiplicateur pour chaque pièce consécutive éliminée
-const String SCORE_FILE_NAME = "scores.txt";
+
+const String SCORE_FILE_PATH = "data/scores";
+const String MENU_FILE_PATH = "static/menu";
+const String PLATEAU_FILE_PATH = "static/plateau";
+const String RULES_FILE_PATH = "static/rules";
+const String TOP_SCORES_FILE_PATH = "static/topscores";
+const String GAME_OVER_FILE_PATH = "static/gameover";
+
+const short PLATEAU_POS_Y = 4;         // definir l'emplacement du plateau
+const short PLATEAU_POS_X = 0;         // definir l'emplacement du plateau
+const short PLATEAU_NEXT_PIECE_X = 11; // definir l'emplacement de la nouveau piece
+const short PLATEAU_NEXT_PIECE_Y = 0;  // definir l'emplacement de la nouveau piece
+const short PLATEAU_SCORE_X = 88;      // definir l'emplacement du score
+const short PLATEAU_SCORE_Y = 0;       // definir l'emplacement du score
 
 class Shape
 {
@@ -100,6 +112,8 @@ class ListDouble
 
 public:
     ListDouble();
+    ~ListDouble();
+
     bool isEmpty();
     bool isLast(NodeDouble *);
 
@@ -125,12 +139,12 @@ class Game
     bool gameOver;
 
     void removeNode(NodeSimple *);
-    void checkConsecutive(bool (Game::*compFunc)(Shape* , Shape*));
+    void checkConsecutive(bool (Game::*compFunc)(Shape *, Shape *));
     void removeConsecutives();
     void leftShift(ListDouble *list); // decalage a gauche
 
-    bool compConsecutivesForms(Shape* , Shape*);
-    bool compConsecutivesColors(Shape* , Shape*);
+    bool compConsecutivesForms(Shape *, Shape *);
+    bool compConsecutivesColors(Shape *, Shape *);
 
 public:
     Game(); // initialisation du jeu
@@ -149,13 +163,12 @@ public:
     void leftShiftForms(Form form);    // decalage a gauche
     void leftShiftColors(Color color); // decalage a gauche
 
-    void deleteConsecutive(NodeSimple *first , int numsuccessive);
+    void deleteConsecutive(NodeSimple *first, int numsuccessive);
 
     void displayMenu();
     void displayGameOver();
-    void displayControlsMenu();
     void displayRules();
+    void displayBestScores();
 
     bool bestScore();
-
 };

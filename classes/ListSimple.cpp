@@ -1,4 +1,4 @@
-#include "../game.hpp"
+#include "../headers/game.hpp"
 
 ListSimple::ListSimple()
 {
@@ -8,14 +8,19 @@ ListSimple::ListSimple()
 
 ListSimple::~ListSimple()
 {
-    NodeSimple *temp = last;
-
-    while ((temp = temp->getNext()) != last)
+    if (!isEmpty())
     {
-        delete temp;
-    }
+        NodeSimple *temp = last->getNext();
 
-    delete last;
+        while (!isLast(temp))
+        {
+            NodeSimple *next = temp->getNext();
+            delete temp;
+            temp = next;
+        }
+
+        delete last;
+    }
 }
 bool ListSimple::isEmpty()
 {
@@ -42,7 +47,7 @@ void ListSimple::add(NodeSimple *node, InsertionDirection direction)
 
     if (last == NULL)
     {
-        node->getShape()->setCoord(0, PLATEAU_POS_Y); // position initiale
+        node->getShape()->setCoord(PLATEAU_POS_X, PLATEAU_POS_Y); // position initiale
         last = node;
         size++;
 
@@ -66,7 +71,7 @@ void ListSimple::add(NodeSimple *node, InsertionDirection direction)
         last->setNext(node);
 
         // mise a jour des coordonnes
-        node->getShape()->setCoord(0, PLATEAU_POS_Y);
+        node->getShape()->setCoord(PLATEAU_POS_X, PLATEAU_POS_Y);
 
         NodeSimple *temp = node->getNext();
 
@@ -127,7 +132,7 @@ void ListSimple::remove(NodeSimple *node)
     delete node; // liberer la memoire
 }
 
-void ListSimple::exchange(NodeSimple *node1, NodeSimple *node2)
+void ListSimple::exchange(NodeSimple *node1, NodeSimple *node2) // echanger deux piece du plateau
 {
     if (node1 == node2 || size == 1 || isEmpty())
         return;
@@ -138,24 +143,22 @@ void ListSimple::exchange(NodeSimple *node1, NodeSimple *node2)
     NodeSimple *next1 = node1->getNext();
     NodeSimple *next2 = node2->getNext();
 
-
-    if (next1 != node2 && next2 != node1)
+    if (next1 != node2 && next2 != node1) // si les pieces ne sont pas consecutives
     {
         node1->setNext(next2);
         node2->setNext(next1);
-        
+
         prev1->setNext(node2);
         prev2->setNext(node1);
-
     }
-    else if (next1 == node2 && next2 != node1)
+    else if (next1 == node2 && next2 != node1) // si le suivant du node1 est le node2
     {
         node2->setNext(node1);
         node1->setNext(next2);
 
         prev1->setNext(node2);
     }
-    else if (next2 == node1 && next1 != node2)
+    else if (next2 == node1 && next1 != node2)  // si le suivant du node2 est le node1
     {
         node1->setNext(node2);
         node2->setNext(next1);
@@ -163,14 +166,13 @@ void ListSimple::exchange(NodeSimple *node1, NodeSimple *node2)
         prev2->setNext(node1);
     }
 
-    if (isLast(node1))
+    if (isLast(node1)) // si le node1 est le dernier
         last = node2;
 
-    if (isLast(node2))
+    if (isLast(node2)) // si le node2 est le dernier
         last = node1;
 
-    node1->getShape()->exchangeWith(node2->getShape());
-
+    node1->getShape()->exchangeWith(node2->getShape()); // echange des coordonnes des deux pieces
 }
 
 bool ListSimple::isLast(NodeSimple *node)
@@ -192,7 +194,7 @@ NodeSimple *ListSimple::findPrev(NodeSimple *node)
 
     NodeSimple *temp = last->getNext();
 
-    while (temp != last)
+    while (temp != last) // parcourir tout la list sauf le dernier element
     {
         if (temp->getNext() == node)
             return temp;

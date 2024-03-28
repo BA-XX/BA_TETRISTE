@@ -1,4 +1,4 @@
-#include "../game.hpp"
+#include "../headers/game.hpp"
 
 NodeDouble::NodeDouble(NodeSimple *node)
 {

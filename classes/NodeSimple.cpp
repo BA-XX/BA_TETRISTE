@@ -1,4 +1,4 @@
-#include "../game.hpp"
+#include "../headers/game.hpp"
 
 NodeSimple::NodeSimple(Shape *shape)
 {
@@ -7,7 +7,8 @@ NodeSimple::NodeSimple(Shape *shape)
 }
 NodeSimple::~NodeSimple()
 {
-    delete shape;
+    delete shape; // liberer la memoire
+    shape = NULL;
 }
 Shape *NodeSimple::getShape()
 {

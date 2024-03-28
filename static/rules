@@ -1,0 +1,37 @@
+  _____  _    _ _      ______  _____ 
+ |  __ \| |  | | |    |  ____|/ ____|
+ | |__) | |  | | |    | |__  | (___  
+ |  _  /| |  | | |    |  __|  \___ \ 
+ | | \ \| |__| | |____| |____ ____) |
+ |_|  \_\\____/|______|______|_____/ 
+               
+                                
+# But du jeu : 
+Le joueur doit former des ensembles de trois pieces consecutives ayant la meme couleur ou forme 
+pour les faire disparaitre et gagner des points.
+
+# Deroulement du jeu :
+1. Le jeu commence avec un plateau vide.
+2. A chaque tour, une nouvelle piece est generee aleatoirement.
+3. Le joueur choisit ou placer la nouvelle piece sur le plateau.
+4. Si le joueur reussit a former un groupe de trois pieces consecutives ayant la meme couleur ou 
+   forme, ces trois pieces sont retirees du plateau, et le joueur recoit 10 points pour chaque 
+   piece ainsi retiree.
+5. Si le plateau est vide, le joueur recoit un bonus de 100 points.
+6. Le jeu se poursuit jusqu'a ce que le plateau contienne 15 pieces.
+
+# Conditions de fin du jeu : 
+Le jeu se termine lorsque le plateau contient 15 pieces. Le score total du joueur est calcule 
+en ajoutant les points obtenus pour chaque piece retiree et les bonus de 100 points chaque fois 
+que le plateau est vide.
+
+# Objectif : 
+Atteindre le meilleur score en planifiant strategiquement l'insertion ou le decalage des pieces.
+
+# Controles :
+
+    - <-: Ajouter a gauche.                  - c : Decalage des cercles.
+    - ->: Ajouter a droite.                  - d : Decalage des losanges.
+    - s : Decalage des carres.               - R : Decalage des pieces rouges.
+    - t : Decalage des triangles.            - B : Decalage des pieces bleues.
+    - Y : Decalage des pieces jaunes.        - G : Decalage des pieces vertes.
