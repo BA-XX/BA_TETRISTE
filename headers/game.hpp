@@ -163,8 +163,6 @@ public:
     void leftShiftForms(Form form);    // decalage a gauche
     void leftShiftColors(Color color); // decalage a gauche
 
-    void deleteConsecutive(NodeSimple *first, int numsuccessive);
-
     void displayMenu();
     void displayGameOver();
     void displayRules();
